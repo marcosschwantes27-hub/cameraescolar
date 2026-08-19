@@ -1,0 +1,20 @@
+services:
+  postgres:
+    image: postgres:18.4-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${REGISTRO_POSTGRES_DB:-registro_escolar}
+      POSTGRES_USER: ${REGISTRO_POSTGRES_USER:-registro_escolar}
+      POSTGRES_PASSWORD: ${REGISTRO_POSTGRES_PASSWORD:?Defina REGISTRO_POSTGRES_PASSWORD}
+    ports:
+      - "127.0.0.1:${REGISTRO_POSTGRES_PORT:-54329}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    volumes:
+      - registro_postgres_data:/var/lib/postgresql
+
+volumes:
+  registro_postgres_data:

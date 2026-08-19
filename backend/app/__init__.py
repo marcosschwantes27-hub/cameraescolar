@@ -1,0 +1,1 @@
+"""Registro Escolar API."""
