@@ -12,7 +12,7 @@ Base do Sistema de Atendimento e Ocorrências Escolares.
 - histórico recente do aluno;
 - contratos TypeScript e adaptador substituível;
 - API FastAPI integrada ao frontend;
-- PostgreSQL direto, sem Supabase;
+- PostgreSQL via API FastAPI, com suporte a Supabase;
 - isolamento das consultas por escola;
 - migrações Alembic e trilha de auditoria;
 - endpoints para alunos e ocorrências.
@@ -32,8 +32,9 @@ React/TypeScript
   -> PostgreSQL
 ```
 
-O projeto não usa Supabase. O navegador nunca acessa o PostgreSQL diretamente: a API faz
-validação, auditoria e persistência. A autenticação está desativada somente no modo local.
+O navegador nunca acessa o PostgreSQL diretamente: a API faz validação, auditoria e
+persistência. O Supabase hospeda somente o PostgreSQL; a senha e demais segredos ficam no
+ambiente da API. A autenticação está desativada somente no modo local.
 
 ## Frontend
 
@@ -45,28 +46,21 @@ npm test
 npm run build
 ```
 
-## Backend local
+## Executar sem Docker usando Supabase
 
-Pré-requisitos: Python 3.13, `uv`, Docker e Docker Compose.
+Pré-requisitos: projeto Supabase, Python 3.13, `uv` e Node.js. O `uv` pode instalar o Python
+3.13 quando ele não estiver disponível.
 
-1. Copie `.env.example` para `.env` e troque as senhas e a chave JWT.
-2. Instale as dependências e inicie o PostgreSQL:
+1. Copie `.env.example` para `.env`. No Supabase, abra **Connect** e copie a URL de conexão. Para
+   uma API persistente, prefira a conexão direta; em rede apenas IPv4, use o **Shared pooler / Session mode**.
+   Troque `postgresql://` por `postgresql+psycopg://`, preserve `?sslmode=require` e defina uma
+   chave JWT aleatória com pelo menos 32 caracteres.
+2. Instale as dependências, aplique as migrações e execute a API:
 
 ```powershell
 uv sync --project backend
-docker compose up -d --wait postgres
-```
-
-3. Aplique as migrações:
-
-```powershell
 uv run --project backend alembic -c backend/alembic.ini upgrade head
-```
-
-4. Execute a API:
-
-```powershell
-uv run --project backend uvicorn app.main:app --reload --app-dir backend
+uv run --project backend uvicorn app.main:app --reload --app-dir backend --port 8000
 ```
 
 A documentação interativa fica em `http://127.0.0.1:8000/docs`.
@@ -74,7 +68,7 @@ Na primeira inicialização local, o sistema cria somente a escola, o usuário t
 turmas. Nenhum aluno, rosto ou registro é criado automaticamente. Os cadastros feitos pela tela
 são reais e permanecem após atualizar a página.
 
-5. Em outro terminal, execute o frontend:
+3. Em outro terminal, execute o frontend:
 
 ```powershell
 npm run dev
@@ -82,26 +76,32 @@ npm run dev
 
 A interface fica em `http://127.0.0.1:4173`.
 
-## Preparar em outro computador
+O arquivo `.env` é ignorado pelo Git. Nunca cole nele valores reais em arquivos versionados, em
+prompts ou em ferramentas de importação.
 
-O banco PostgreSQL não precisa ser enviado pelo GitHub. Cada computador cria seu próprio banco
-local no volume do Docker e a API prepara a estrutura vazia na primeira execução.
+## Frontend no Google AI Studio
+
+O AI Studio pode remodelar o frontend, mas a API FastAPI precisa estar em uma URL HTTPS pública
+para que um frontend remoto acesse o banco indiretamente. O Supabase substitui apenas o PostgreSQL
+local; ele não hospeda esta API automaticamente.
+
+1. Implante a pasta `backend` em um serviço que execute Python e configure nesse serviço as
+   variáveis `REGISTRO_*` reais.
+2. Execute `alembic upgrade head` uma vez usando a conexão direta do Supabase.
+3. Defina `VITE_API_BASE_URL` com a URL HTTPS pública da API no ambiente de build do frontend.
+4. Adicione a origem HTTPS publicada pelo AI Studio a `REGISTRO_CORS_ALLOWED_ORIGINS` e faça novo
+   deploy da API. Mantenha apenas origens explícitas.
+
+Veja a lista de verificação em [docs/google-ai-studio-import.md](docs/google-ai-studio-import.md).
+
+## Alternativa: PostgreSQL local com Docker
+
+O Docker continua como alternativa para desenvolvimento local. Defina no `.env` as variáveis
+`REGISTRO_POSTGRES_DB`, `REGISTRO_POSTGRES_USER`, `REGISTRO_POSTGRES_PASSWORD` e
+`REGISTRO_POSTGRES_PORT`, troque `REGISTRO_DATABASE_URL` pela URL local e inicie o serviço:
 
 ```powershell
-git clone URL_DO_REPOSITORIO
-cd cameraescolar
-Copy-Item .env.example .env
-npm ci
-uv sync --project backend
 docker compose up -d --wait postgres
-uv run --project backend alembic -c backend/alembic.ini upgrade head
-```
-
-Depois, execute a API e o frontend em dois terminais:
-
-```powershell
-uv run --project backend uvicorn app.main:app --app-dir backend --port 8000
-npm run dev
 ```
 
 O `.env`, o banco, os alunos e as biometrias nunca devem ser enviados ao GitHub. Os modelos
