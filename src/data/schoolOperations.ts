@@ -32,3 +32,8 @@ export interface SchoolOperations {
   ): Promise<FaceEnrollmentResult>;
   identifyFace(frames: Blob[], signal?: AbortSignal): Promise<FaceRecognitionResult>;
 }
+
+import { FirebaseSchoolOperations } from "./firebaseSchoolOperations";
+
+export const schoolOperations: SchoolOperations = new FirebaseSchoolOperations();
+

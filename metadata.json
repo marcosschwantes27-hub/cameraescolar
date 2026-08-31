@@ -1,0 +1,10 @@
+{
+  "name": "Registro Escolar",
+  "description": "Sistema de atendimento e registro de ocorrências escolares com identificação facial",
+  "requestFramePermissions": [
+    "camera"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

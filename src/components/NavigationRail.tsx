@@ -1,8 +1,9 @@
 import { Icon } from "./Icons";
 
-export type AppView = "attendance" | "enrollment" | "identification";
+export type AppView = "late_arrival" | "attendance" | "enrollment" | "identification";
 
 const navigation = [
+  { id: "late_arrival" as const, label: "Atrasos", icon: "clock" as const },
   { id: "attendance" as const, label: "Atendimentos", icon: "records" as const },
   { id: "enrollment" as const, label: "Cadastrar", icon: "students" as const },
   { id: "identification" as const, label: "Identificação", icon: "camera" as const },

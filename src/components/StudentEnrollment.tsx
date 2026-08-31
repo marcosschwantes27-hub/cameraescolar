@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import type { Classroom, FaceCaptureFrame } from "../domain/face";
 import type { Student } from "../domain/school";
 import type { SchoolOperations } from "../data/schoolOperations";
+import { fixtureClassrooms } from "../data/fixtures";
 import { CameraCapture } from "./CameraCapture";
 import { Icon } from "./Icons";
 
@@ -16,11 +17,15 @@ export function StudentEnrollment({
   existingStudent = null,
   onComplete,
 }: StudentEnrollmentProps) {
-  const [classrooms, setClassrooms] = useState<Classroom[]>([]);
+  const [classrooms, setClassrooms] = useState<Classroom[]>(fixtureClassrooms);
   const [name, setName] = useState(existingStudent?.name ?? "");
   const [preferredName, setPreferredName] = useState(existingStudent?.preferredName ?? "");
   const [enrollmentCode, setEnrollmentCode] = useState(existingStudent?.enrollmentCode ?? "");
-  const [classroomId, setClassroomId] = useState("");
+  const [classroomId, setClassroomId] = useState(
+    existingStudent
+      ? fixtureClassrooms.find((item) => item.name === existingStudent.classroom && item.shift === existingStudent.shift)?.id || fixtureClassrooms[0].id
+      : fixtureClassrooms[0].id
+  );
   const [createdStudent, setCreatedStudent] = useState<Student | null>(existingStudent);
   const [status, setStatus] = useState<
     | { kind: "idle" }
@@ -33,17 +38,19 @@ export function StudentEnrollment({
     const controller = new AbortController();
     adapter.listClassrooms(controller.signal)
       .then((items) => {
-        setClassrooms(items);
-        setClassroomId((current) => current
-          || items.find((item) => (
-            item.name === existingStudent?.classroom && item.shift === existingStudent.shift
-          ))?.id
-          || items[0]?.id
-          || "");
+        if (items && items.length > 0) {
+          setClassrooms(items);
+          setClassroomId((current) => current
+            || items.find((item) => (
+              item.name === existingStudent?.classroom && item.shift === existingStudent.shift
+            ))?.id
+            || items[0]?.id
+            || "");
+        }
       })
       .catch((error: unknown) => {
         if (error instanceof DOMException && error.name === "AbortError") return;
-        setStatus({ kind: "error", message: "Não foi possível carregar as turmas." });
+        console.warn("Using fallback classrooms list:", error);
       });
     return () => controller.abort();
   }, [adapter, existingStudent]);

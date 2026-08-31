@@ -1,6 +1,7 @@
 import { useCallback, useState } from "react";
 import { NavigationRail } from "./components/NavigationRail";
 import type { AppView } from "./components/NavigationRail";
+import { LateArrivalFlow } from "./components/LateArrivalFlow";
 import { FaceIdentification } from "./components/FaceIdentification";
 import { StudentEnrollment } from "./components/StudentEnrollment";
 import { OccurrenceForm } from "./components/OccurrenceForm";
@@ -8,7 +9,7 @@ import { StudentHistory } from "./components/StudentHistory";
 import { StudentSearch } from "./components/StudentSearch";
 import type { StudentSearchStatus } from "./components/StudentSearch";
 import { Icon } from "./components/Icons";
-import { schoolOperations } from "./data/apiSchoolOperations";
+import { schoolOperations } from "./data/schoolOperations";
 import type { Occurrence, Student } from "./domain/school";
 
 function faceStatusLabel(student: Student) {
@@ -20,7 +21,7 @@ function faceStatusLabel(student: Student) {
 export function App() {
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
   const [latestOccurrence, setLatestOccurrence] = useState<Occurrence | null>(null);
-  const [activeView, setActiveView] = useState<AppView>("attendance");
+  const [activeView, setActiveView] = useState<AppView>("late_arrival");
   const [reenrollmentStudent, setReenrollmentStudent] = useState<Student | null>(null);
   const [studentSearchStatus, setStudentSearchStatus] = useState<StudentSearchStatus>("loading");
 
@@ -71,6 +72,10 @@ export function App() {
             </div>
           </div>
         </header>
+
+        {activeView === "late_arrival" && (
+          <LateArrivalFlow adapter={schoolOperations} />
+        )}
 
         {activeView === "enrollment" && (
           <StudentEnrollment

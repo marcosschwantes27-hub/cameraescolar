@@ -1,0 +1,75 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "entities": {
+    "Student": {
+      "title": "Student",
+      "description": "Estudante matriculado na escola com dados cadastrais e biometria",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "schoolId": { "type": "string" },
+        "name": { "type": "string" },
+        "preferredName": { "type": ["string", "null"] },
+        "enrollmentCode": { "type": "string" },
+        "classroom": { "type": "string" },
+        "shift": { "type": "string", "enum": ["Manhã", "Tarde", "Noite"] },
+        "status": { "type": "string", "enum": ["active", "inactive"] },
+        "initials": { "type": "string" },
+        "faceEnrollmentStatus": { "type": "string", "enum": ["not_enrolled", "enrolled", "review_needed"] },
+        "faceTemplates": { "type": "array" },
+        "photoThumbnail": { "type": ["string", "null"] },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["id", "schoolId", "name", "enrollmentCode", "classroom", "shift", "status", "initials", "faceEnrollmentStatus"]
+    },
+    "Occurrence": {
+      "title": "Occurrence",
+      "description": "Registro de atendimento ou ocorrência escolar",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "schoolId": { "type": "string" },
+        "studentId": { "type": "string" },
+        "type": { "type": "string", "enum": ["late_arrival", "early_departure", "school_record", "meeting_minutes", "warning"] },
+        "reason": { "type": "string" },
+        "description": { "type": ["string", "null"] },
+        "responsibleName": { "type": ["string", "null"] },
+        "participants": { "type": ["string", "null"] },
+        "attachment": { "type": ["object", "null"] },
+        "occurredAt": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "createdBy": { "type": "object" },
+        "identificationSource": { "type": "string", "enum": ["manual", "facial"] },
+        "status": { "type": "string", "enum": ["active", "cancelled"] }
+      },
+      "required": ["id", "schoolId", "studentId", "type", "reason", "occurredAt", "createdAt", "createdBy", "identificationSource", "status"]
+    },
+    "Classroom": {
+      "title": "Classroom",
+      "description": "Turma escolar",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "academicYear": { "type": "number" },
+        "shift": { "type": "string", "enum": ["Manhã", "Tarde", "Noite"] }
+      },
+      "required": ["id", "name", "academicYear", "shift"]
+    }
+  },
+  "firestore": {
+    "/students/{studentId}": {
+      "schema": "Student",
+      "description": "Coleção de estudantes"
+    },
+    "/occurrences/{occurrenceId}": {
+      "schema": "Occurrence",
+      "description": "Coleção de ocorrências e atendimentos"
+    },
+    "/classrooms/{classroomId}": {
+      "schema": "Classroom",
+      "description": "Coleção de turmas"
+    }
+  }
+}

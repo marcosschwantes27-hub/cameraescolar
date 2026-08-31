@@ -11,6 +11,7 @@ type IconName =
   | "arrow"
   | "file"
   | "info"
+  | "face_id"
   | "check";
 
 const paths: Record<IconName, React.ReactNode> = {
@@ -24,6 +25,7 @@ const paths: Record<IconName, React.ReactNode> = {
   arrow: <><path d="M5 12h14M13 6l6 6-6 6"/></>,
   file: <><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></>,
   info: <><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></>,
+  face_id: <><path d="M7 3H5a2 2 0 0 0-2 2v2M17 3h2a2 2 0 0 1 2 2v2M7 21H5a2 2 0 0 1-2-2v-2M17 21h2a2 2 0 0 0 2-2v-2M9 9h.01M15 9h.01M10 13c.5.5 1.5.5 2 0M9 17c1.5 1 4.5 1 6 0"/></>,
   check: <path d="m5 12 4 4L19 6"/>,
 };
 

@@ -1,4 +1,17 @@
 import type { Occurrence, Student } from "../domain/school";
+import type { Classroom } from "../domain/face";
+
+export const fixtureClassrooms: Classroom[] = [
+  { id: "2b-em-manha", name: "2º Ano B - Ensino Médio", academicYear: 2026, shift: "Manhã" },
+  { id: "2b-manha", name: "2º ano B", academicYear: 2026, shift: "Manhã" },
+  { id: "2b-tarde", name: "2º ano B", academicYear: 2026, shift: "Tarde" },
+  { id: "1a-em-manha", name: "1º Ano A - Ensino Médio", academicYear: 2026, shift: "Manhã" },
+  { id: "3c-em-tarde", name: "3º Ano C - Ensino Médio", academicYear: 2026, shift: "Tarde" },
+  { id: "8b-ef-manha", name: "8º ano B", academicYear: 2026, shift: "Manhã" },
+  { id: "9a-ef-tarde", name: "9º Ano A - Ensino Fundamental", academicYear: 2026, shift: "Tarde" },
+  { id: "7c-ef-tarde", name: "7º ano C", academicYear: 2026, shift: "Tarde" },
+  { id: "eja-noite", name: "EJA - Módulo II", academicYear: 2026, shift: "Noite" },
+];
 
 export const fixtureStudents: Student[] = [
   {

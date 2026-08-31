@@ -1,0 +1,50 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper validation functions
+    function isValidStudent(data) {
+      return data.name is string && data.name.size() > 0
+        && data.enrollmentCode is string && data.enrollmentCode.size() > 0
+        && data.classroom is string
+        && data.shift in ['Manhã', 'Tarde', 'Noite']
+        && data.status in ['active', 'inactive']
+        && data.faceEnrollmentStatus in ['not_enrolled', 'enrolled', 'review_needed'];
+    }
+
+    function isValidOccurrence(data) {
+      return data.studentId is string
+        && data.type in ['late_arrival', 'early_departure', 'school_record', 'meeting_minutes', 'warning']
+        && data.reason is string && data.reason.size() > 0
+        && data.occurredAt is string
+        && data.status in ['active', 'cancelled'];
+    }
+
+    function isValidClassroom(data) {
+      return data.name is string && data.name.size() > 0
+        && data.academicYear is number
+        && data.shift in ['Manhã', 'Tarde', 'Noite'];
+    }
+
+    match /students/{studentId} {
+      allow read: if true;
+      allow create, update: if isValidStudent(request.resource.data);
+      allow delete: if false;
+    }
+
+    match /occurrences/{occurrenceId} {
+      allow read: if true;
+      allow create, update: if isValidOccurrence(request.resource.data);
+      allow delete: if false;
+    }
+
+    match /classrooms/{classroomId} {
+      allow read: if true;
+      allow create, update: if isValidClassroom(request.resource.data);
+      allow delete: if false;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
